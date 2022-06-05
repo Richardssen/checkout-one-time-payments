@@ -58,12 +58,12 @@ def create_checkout_session():
         # [payment_intent_data] - lets capture the payment later
         # [customer_email] - lets you prefill the email input in the form
         # For full details see https:#stripe.com/docs/api/checkout/sessions/create
-        
+
         # ?session_id={CHECKOUT_SESSION_ID} means the redirect will have the session ID set as a query param
         checkout_session = stripe.checkout.Session.create(
-            success_url=domain_url +
-            "/success.html?session_id={CHECKOUT_SESSION_ID}",
-            cancel_url=domain_url + "/canceled.html",
+            success_url=domain_url
+            + "/success.html?session_id={CHECKOUT_SESSION_ID}",
+            cancel_url=f"{domain_url}/canceled.html",
             payment_method_types=["card"],
             line_items=[
                 {
@@ -71,10 +71,11 @@ def create_checkout_session():
                     "images": ["https://picsum.photos/300/300?random=4"],
                     "quantity": data['quantity'],
                     "currency": os.getenv('CURRENCY'),
-                    "amount": os.getenv('BASE_PRICE')
+                    "amount": os.getenv('BASE_PRICE'),
                 }
-            ]
+            ],
         )
+
         return jsonify({'sessionId': checkout_session['id']})
     except Exception as e:
         return jsonify(e), 40
@@ -103,7 +104,7 @@ def webhook_received():
         event_type = request_data['type']
     data_object = data['object']
 
-    print('event ' + event_type)
+    print(f'event {event_type}')
 
     if event_type == 'checkout.session.completed':
         print('🔔 Payment succeeded!')
